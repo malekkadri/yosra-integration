@@ -201,8 +201,23 @@ $totalAllUsers = count($allUsers);
             <!-- Nav Item - Users -->
             <li class="nav-item">
                 <a class="nav-link" href="posts_list.php">
-                    <i class="fas fa-fw fa-users"></i>
+                    <i class="fas fa-fw fa-comment"></i>
                     <span>Postes</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="articles_list.php">
+                    <i class="fas fa-fw fa-newspaper"></i>
+                    <span>Articles</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="categories_list.php">
+                    <i class="fas fa-fw fa-folder-open"></i>
+                    <span>Catégories</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="comment_articles_list.php">
+                    <i class="fas fa-fw fa-comments"></i>
+                    <span>Commentaires d'articles</span></a>
             </li>
 
             <!-- Nav Item - Charts -->

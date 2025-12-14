@@ -292,23 +292,31 @@ $totalAllUsers = count($allUsers);
             </div>
 
             <!-- Nav Item - Users -->
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="users_list.php">
                     <i class="fas fa-fw fa-users"></i>
                     <span>Utilisateurs</span></a>
             </li>
-            <!-- Nav Item - Users -->
-            <li class="nav-item">
+            <!-- Nav Item - Posts -->
+            <li class="nav-item active">
                 <a class="nav-link" href="posts_list.php">
-                    <i class="fas fa-fw fa-users"></i>
+                    <i class="fas fa-fw fa-comment"></i>
                     <span>Postes</span></a>
             </li>
-
-            <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="charts.php">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Statistiques</span></a>
+                <a class="nav-link" href="articles_list.php">
+                    <i class="fas fa-fw fa-newspaper"></i>
+                    <span>Articles</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="categories_list.php">
+                    <i class="fas fa-fw fa-folder-open"></i>
+                    <span>Catégories</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="comment_articles_list.php">
+                    <i class="fas fa-fw fa-comments"></i>
+                    <span>Commentaires d'articles</span></a>
             </li>
 
             <!-- Divider -->
