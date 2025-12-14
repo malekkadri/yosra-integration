@@ -23,9 +23,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['article_action'])) {
     $contenu = trim($_POST['contenu'] ?? '');
     $idCategorie = (int)($_POST['id_categorie'] ?? 0);
     $imagePath = trim($_POST['image_path'] ?? '');
+    $uploadDir = __DIR__ . '/../frontoffice/uploads/articles';
+    $hasUploadError = false;
+
+    if (!empty($_FILES['image_upload']) && $_FILES['image_upload']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+        $fileError = $_FILES['image_upload']['error'];
+
+        if ($fileError === UPLOAD_ERR_OK) {
+            $extension = strtolower(pathinfo($_FILES['image_upload']['name'], PATHINFO_EXTENSION));
+            if (in_array($extension, $allowedExtensions, true)) {
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0775, true);
+                }
+
+                $fileName = uniqid('article_', true) . '.' . $extension;
+                $destination = $uploadDir . '/' . $fileName;
+
+                if (move_uploaded_file($_FILES['image_upload']['tmp_name'], $destination)) {
+                    $imagePath = '../frontoffice/uploads/articles/' . $fileName;
+                } else {
+                    $message = "Échec du téléchargement de l'image.";
+                    $messageType = 'danger';
+                    $hasUploadError = true;
+                }
+            } else {
+                $message = "Format d'image non pris en charge. Utilisez jpg, jpeg, png ou gif.";
+                $messageType = 'danger';
+                $hasUploadError = true;
+            }
+        } else {
+            $message = "Une erreur est survenue lors de l'envoi de l'image.";
+            $messageType = 'danger';
+            $hasUploadError = true;
+        }
+    }
     $status = $_POST['status'] ?? 'pending';
 
-    if ($titre && $contenu && $idCategorie) {
+    if ($titre && $contenu && $idCategorie && !$hasUploadError) {
         $article = new Article($titre, $contenu, $idCategorie, $imagePath, null, $status, $_SESSION['user_id']);
         if ($_POST['article_action'] === 'create') {
             $articleC->addArticle($article);
@@ -34,10 +69,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['article_action'])) {
             $articleC->updateArticle((int)$_POST['id_article'], $article);
             $message = 'Article mis à jour.';
         }
-    } else {
+    } elseif (!$hasUploadError) {
         $message = 'Merci de remplir tous les champs obligatoires.';
         $messageType = 'danger';
     }
+}
+
+function resolveImagePath(?string $path): string {
+    if (empty($path)) {
+        return '';
+    }
+
+    if (strpos($path, '../') === 0 || strpos($path, '/') === 0 || strpos($path, 'http') === 0) {
+        return $path;
+    }
+
+    return '../frontoffice/' . ltrim($path, '/');
 }
 
 if (isset($_GET['action'], $_GET['id'])) {
@@ -192,7 +239,7 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                             <?php endif; ?>
                         </div>
                         <div class="card-body">
-                            <form method="POST" class="needs-validation" novalidate>
+                            <form method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
                                 <input type="hidden" name="article_action" value="<?php echo $editingArticle ? 'update' : 'create'; ?>">
                                 <?php if ($editingArticle): ?>
                                     <input type="hidden" name="id_article" value="<?php echo htmlspecialchars($editingArticle['id_article']); ?>">
@@ -215,10 +262,15 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Image (chemin)</label>
+                                    <label>Image (chemin ou téléversement)</label>
                                     <input type="text" name="image_path" class="form-control" value="<?php echo htmlspecialchars($editingArticle['image_path'] ?? ''); ?>" placeholder="/uploads/image.jpg">
+                                    <div class="custom-file mt-2">
+                                        <input type="file" class="custom-file-input" id="imageUpload" name="image_upload" accept="image/*">
+                                        <label class="custom-file-label" for="imageUpload">Choisir une image…</label>
+                                    </div>
+                                    <small class="form-text text-muted">Formats acceptés : jpg, jpeg, png, gif.</small>
                                     <?php if (!empty($editingArticle['image_path'])): ?>
-                                        <div class="mt-2"><img src="<?php echo htmlspecialchars($editingArticle['image_path']); ?>" alt="aperçu" class="img-fluid rounded"></div>
+                                        <div class="mt-2"><img src="<?php echo htmlspecialchars(resolveImagePath($editingArticle['image_path'])); ?>" alt="aperçu" class="img-fluid rounded"></div>
                                     <?php endif; ?>
                                 </div>
                                 <div class="form-group">
