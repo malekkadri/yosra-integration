@@ -56,6 +56,92 @@ $userReaction = ($currentArticle && isset($_SESSION['user_id'])) ? $reactionC->u
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Article</title>
     <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(103, 64, 186, 0.8), rgba(45, 150, 233, 0.8));
+            padding: 30px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+        }
+
+        .article-card, .sidebar-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar-card ul li a {
+            display: block;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            margin-bottom: 8px;
+        }
+
+        .article-image {
+            width: 100%;
+            border-radius: 12px;
+            margin: 15px 0;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .meta-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: #cfd8dc;
+            font-size: 0.95em;
+        }
+
+        .pill {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 6px 12px;
+            border-radius: 30px;
+        }
+
+        .comments-section {
+            margin-top: 30px;
+        }
+
+        .comment-item {
+            padding: 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 10px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            color: #cfd8dc;
+        }
+
+        .empty-state {
+            padding: 18px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px dashed rgba(255, 255, 255, 0.25);
+            text-align: center;
+            color: #cfd8dc;
+        }
+
+        @media (max-width: 980px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body class="is-preload">
 <div id="page-wrapper">
@@ -83,66 +169,83 @@ $userReaction = ($currentArticle && isset($_SESSION['user_id'])) ? $reactionC->u
 
     <div class="wrapper">
         <div class="inner">
-            <div style="display:flex; gap:20px; align-items:flex-start;">
-                <aside style="width:25%;">
-                    <h3>Articles disponibles</h3>
+            <div class="hero-banner">
+                <h1 style="margin: 0 0 6px 0;">Articles SafeSpace</h1>
+                <p style="color:#e0f7fa; margin:0;">Découvrez, réagissez et partagez vos idées dans un espace chaleureux.</p>
+            </div>
+            <div class="content-grid">
+                <aside class="sidebar-card">
+                    <h3 style="margin-bottom: 12px;">Articles disponibles</h3>
                     <ul>
                         <?php foreach ($articles as $art): ?>
                             <li><a href="article_detail.php?id=<?php echo $art['id_article']; ?>"><?php echo htmlspecialchars($art['titre']); ?></a></li>
                         <?php endforeach; ?>
                     </ul>
                 </aside>
-                <main style="width:75%;">
+                <main>
                     <?php if ($currentArticle): ?>
                         <?php $cat = $categorieC->getCategorie((int)$currentArticle['id_categorie']); ?>
-                        <h2><?php echo htmlspecialchars($currentArticle['titre']); ?></h2>
-                        <p><em>Catégorie : <?php echo htmlspecialchars($cat['nom_categorie'] ?? ''); ?> | Publié le <?php echo htmlspecialchars($currentArticle['date_creation']); ?></em></p>
-                        <?php if (!empty($currentArticle['image_path'])): ?>
-                            <img src="<?php echo htmlspecialchars($currentArticle['image_path']); ?>" alt="Image de l'article" style="max-width:100%; height:auto;" />
-                        <?php endif; ?>
-                        <p><?php echo nl2br(htmlspecialchars($currentArticle['contenu'])); ?></p>
+                        <article class="article-card">
+                            <header style="margin-bottom: 12px;">
+                                <h2 style="margin-bottom: 8px;"><?php echo htmlspecialchars($currentArticle['titre']); ?></h2>
+                                <div class="meta-row">
+                                    <span class="pill">Catégorie : <?php echo htmlspecialchars($cat['nom_categorie'] ?? ''); ?></span>
+                                    <span class="pill">Publié le <?php echo htmlspecialchars($currentArticle['date_creation']); ?></span>
+                                </div>
+                            </header>
 
-                        <div class="comments-section">
-                            <h3>Réactions</h3>
-                            <p>👍 <?php echo $reactionCounts['like'] ?? 0; ?> | 👎 <?php echo $reactionCounts['dislike'] ?? 0; ?></p>
-                            <?php if (isset($_SESSION['user_id'])): ?>
-                                <?php if ($userReaction): ?>
-                                    <p>Vous avez déjà réagi : <?php echo htmlspecialchars($userReaction['reaction']); ?></p>
+                            <?php if (!empty($currentArticle['image_path'])): ?>
+                                <img src="<?php echo htmlspecialchars($currentArticle['image_path']); ?>" alt="Image de l'article" class="article-image" />
+                            <?php endif; ?>
+
+                            <p><?php echo nl2br(htmlspecialchars($currentArticle['contenu'])); ?></p>
+
+                            <div class="comments-section">
+                                <h3>Réactions</h3>
+                                <p class="meta-row" style="margin: 8px 0 12px 0;">👍 <?php echo $reactionCounts['like'] ?? 0; ?> | 👎 <?php echo $reactionCounts['dislike'] ?? 0; ?></p>
+                                <?php if (isset($_SESSION['user_id'])): ?>
+                                    <?php if ($userReaction): ?>
+                                        <p class="pill">Vous avez déjà réagi : <?php echo htmlspecialchars($userReaction['reaction']); ?></p>
+                                    <?php else: ?>
+                                        <form method="POST" style="display:flex; gap:10px; flex-wrap: wrap;">
+                                            <button type="submit" name="reaction" value="like" class="button primary">J'aime</button>
+                                            <button type="submit" name="reaction" value="dislike" class="button">Je n'aime pas</button>
+                                        </form>
+                                    <?php endif; ?>
                                 <?php else: ?>
-                                    <form method="POST" style="display:flex; gap:10px;">
-                                        <button type="submit" name="reaction" value="like" class="button primary">J'aime</button>
-                                        <button type="submit" name="reaction" value="dislike" class="button">Je n'aime pas</button>
-                                    </form>
+                                    <p><a href="login.php">Connectez-vous</a> pour réagir.</p>
                                 <?php endif; ?>
-                            <?php else: ?>
-                                <p><a href="login.php">Connectez-vous</a> pour réagir.</p>
-                            <?php endif; ?>
-                        </div>
+                            </div>
 
-                        <div class="comments-section">
-                            <h3>Commentaires</h3>
-                            <?php if (isset($_SESSION['user_id'])): ?>
-                                <form method="POST" style="margin-bottom:15px;">
-                                    <textarea name="commentaire" rows="3" class="form-control" placeholder="Votre commentaire" required></textarea>
-                                    <button type="submit" class="button primary" style="margin-top:10px;">Publier</button>
-                                </form>
-                            <?php else: ?>
-                                <p><a href="login.php">Connectez-vous</a> pour commenter cet article.</p>
-                            <?php endif; ?>
-                            <ul class="comments-list">
-                                <?php foreach ($comments as $comment): ?>
-                                    <li class="comment-item">
-                                        <div class="comment-header">
-                                            <span class="author"><?php echo htmlspecialchars($comment['user_name'] ?? ('Utilisateur #' . $comment['id_user'])); ?></span>
-                                            <span class="time"><?php echo htmlspecialchars($comment['date_comment']); ?></span>
-                                        </div>
-                                        <div class="message"><?php echo nl2br(htmlspecialchars($comment['contenu'])); ?></div>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
+                            <div class="comments-section">
+                                <h3>Commentaires</h3>
+                                <?php if (isset($_SESSION['user_id'])): ?>
+                                    <form method="POST" style="margin-bottom:15px;">
+                                        <textarea name="commentaire" rows="3" class="form-control" placeholder="Votre commentaire" required></textarea>
+                                        <button type="submit" class="button primary" style="margin-top:10px;">Publier</button>
+                                    </form>
+                                <?php else: ?>
+                                    <p><a href="login.php">Connectez-vous</a> pour commenter cet article.</p>
+                                <?php endif; ?>
+                                <?php if ($comments): ?>
+                                    <ul class="comments-list">
+                                        <?php foreach ($comments as $comment): ?>
+                                            <li class="comment-item">
+                                                <div class="comment-header">
+                                                    <span class="author"><?php echo htmlspecialchars($comment['user_name'] ?? ('Utilisateur #' . $comment['id_user'])); ?></span>
+                                                    <span class="time"><?php echo htmlspecialchars($comment['date_comment']); ?></span>
+                                                </div>
+                                                <div class="message"><?php echo nl2br(htmlspecialchars($comment['contenu'])); ?></div>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php else: ?>
+                                    <div class="empty-state">Aucun commentaire pour le moment. Soyez le premier à réagir !</div>
+                                <?php endif; ?>
+                            </div>
+                        </article>
                     <?php else: ?>
-                        <p>Aucun article disponible pour le moment.</p>
+                        <div class="empty-state">Aucun article disponible pour le moment.</div>
                     <?php endif; ?>
                 </main>
             </div>
