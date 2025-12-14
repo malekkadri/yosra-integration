@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 session_start();
 
 // Inclure l'AuthController pour vérifier l'authentification
-$controller_path = $_SERVER['DOCUMENT_ROOT'] . '/SAFEProject/Controller/AuthController.php';
+$controller_path = $_SERVER['DOCUMENT_ROOT'] . '/SAFEProject/controller/AuthController.php';
 if (file_exists($controller_path)) {
     require_once $controller_path;
     $authController = new AuthController();
@@ -15,8 +15,8 @@ if (file_exists($controller_path)) {
     die("Erreur: Fichier contrôleur introuvable");
 }
 
-//for Post 
-require_once $_SERVER['DOCUMENT_ROOT'].'/SAFEProject/controller/UserController.php';
+//for Post
+require_once $_SERVER['DOCUMENT_ROOT'].'/SAFEProject/controller/usercontroller.php';
 
 $userController = new UserController();
 $users = $userController->listUsers();

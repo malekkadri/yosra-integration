@@ -2,7 +2,7 @@
 session_start();
 
 // Inclure les contrôleurs
-require_once $_SERVER['DOCUMENT_ROOT'].'/SAFEProject/controller/UserController.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/SAFEProject/controller/usercontroller.php';
 
 // Vérifier si un ID utilisateur est spécifié, sinon utiliser l'utilisateur connecté
 $profileUserId = $_GET['id'] ?? ($_SESSION['user_id'] ?? null);
