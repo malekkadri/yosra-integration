@@ -7,7 +7,7 @@ if (isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/SAFEProject/controller/UserController.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/SAFEProject/controller/usercontroller.php';
 
 $message = '';
 $message_type = ''; // 'success' ou 'error'
