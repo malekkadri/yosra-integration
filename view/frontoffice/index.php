@@ -39,6 +39,24 @@ $categorieC = new CategorieC();
 $reactionC = new ReactionC();
 $commentArticleC = new CommentArticleC();
 $articles = $articleC->listArticles('approved');
+$categories = $categorieC->listCategories();
+$selectedCategory = (int)($_GET['category'] ?? 0);
+$articleSearch = trim($_GET['q'] ?? '');
+
+// allow simple filtering from the landing page
+if ($selectedCategory) {
+    $articles = array_filter($articles, function ($article) use ($selectedCategory) {
+        return (int)$article['id_categorie'] === $selectedCategory;
+    });
+}
+
+if ($articleSearch !== '') {
+    $articles = array_filter($articles, function ($article) use ($articleSearch) {
+        return stripos($article['titre'], $articleSearch) !== false || stripos($article['contenu'], $articleSearch) !== false;
+    });
+}
+
+$articleCount = count($articles);
 
 // Create a function to get user fullname by ID
 function getUserFullnameById($userId, $userController) {
@@ -130,18 +148,39 @@ function getUserFullnameById($userId, $userController) {
                     </div>
                 </section>
                 <section class="articles-section">
-                    <div style="display:flex; align-items:center; justify-content: space-between;">
-                        <h2>Articles approuvés</h2>
+                    <div style="display:flex; align-items:center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
                         <div>
-                            <a class="button" href="article_detail.php">Découvrir</a>
-                            <?php if (isset($_SESSION['user_id'])): ?>
-                                <a class="button primary" href="addArticle.php">Proposer un article</a>
-                            <?php else: ?>
-                                <a class="button" href="login.php">Connectez-vous pour proposer</a>
-                            <?php endif; ?>
+                            <p class="pill" style="display:inline-block; margin-bottom:8px;">📚 <?php echo $articleCount; ?> article<?php echo $articleCount > 1 ? 's' : ''; ?> approuvés</p>
+                            <h2 style="margin:0;">Articles approuvés</h2>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap: wrap; align-items:center;">
+                            <form method="GET" style="display:flex; gap:8px; flex-wrap: wrap;">
+                                <input type="text" name="q" placeholder="Rechercher un titre ou une idée" value="<?php echo htmlspecialchars($articleSearch); ?>" style="padding:8px 10px; border-radius: 8px; border: 1px solid #ddd; min-width:220px;">
+                                <select name="category" style="padding:8px 10px; border-radius: 8px; border: 1px solid #ddd; min-width: 180px;">
+                                    <option value="0">Toutes les catégories</option>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?php echo $cat['id_categorie']; ?>" <?php echo $selectedCategory === (int)$cat['id_categorie'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['nom_categorie']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button class="button primary" type="submit">Filtrer</button>
+                                <?php if ($selectedCategory || $articleSearch !== ''): ?>
+                                    <a class="button" href="index.php">Réinitialiser</a>
+                                <?php endif; ?>
+                            </form>
+                            <div>
+                                <a class="button" href="article_detail.php">Découvrir</a>
+                                <?php if (isset($_SESSION['user_id'])): ?>
+                                    <a class="button primary" href="addArticle.php">Proposer un article</a>
+                                <?php else: ?>
+                                    <a class="button" href="login.php">Connectez-vous pour proposer</a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                     <div class="comments-section">
+                        <?php if (!$articles): ?>
+                            <div class="comment-item" style="text-align:center;">Aucun article ne correspond à vos filtres. Essayez une autre recherche.</div>
+                        <?php endif; ?>
                         <ul class="comments-list">
                             <?php foreach ($articles as $article): ?>
                                 <?php
@@ -156,7 +195,7 @@ function getUserFullnameById($userId, $userController) {
                                     </div>
                                     <div class="message"><strong><?php echo htmlspecialchars($article['titre']); ?></strong><br><?php echo nl2br(htmlspecialchars(substr($article['contenu'],0,160))); ?>...</div>
                                     <div class="comment-footer">
-                                        <div class="comment-actions">
+                                        <div class="comment-actions" style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
                                             <a class="button" href="article_detail.php?id=<?php echo $article['id_article']; ?>">Lire l'article</a>
                                             <span class="id">👍 <?php echo $counts['like'] ?? 0; ?> | 👎 <?php echo $counts['dislike'] ?? 0; ?></span>
                                         </div>

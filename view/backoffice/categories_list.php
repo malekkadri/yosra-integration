@@ -56,6 +56,10 @@ foreach ($articles as $article) {
     $categoryUsage[$catId]++;
 }
 
+$unusedCategories = count(array_filter($categories, function ($cat) use ($categoryUsage) {
+    return ($categoryUsage[$cat['id_categorie']] ?? 0) === 0;
+}));
+
 if ($search) {
     $categories = array_filter($categories, function ($cat) use ($search) {
         return stripos($cat['nom_categorie'], $search) !== false || stripos($cat['description'], $search) !== false;
@@ -111,6 +115,33 @@ if ($search) {
                     </button>
                 </div>
             <?php endif; ?>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total catégories</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo count($categories); ?></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Catégories utilisées</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo count($categories) - $unusedCategories; ?></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Sans article lié</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $unusedCategories; ?></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="row">
                 <div class="col-lg-4">
