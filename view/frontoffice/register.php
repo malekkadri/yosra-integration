@@ -1,13 +1,6 @@
 <?php
+require_once $_SERVER['DOCUMENT_ROOT'].'/SAFEProject/controller/AuthController.php';
 session_start();
-
-// Inclure le contrôleur d'authentification avec un chemin fiable
-$controller_path = $_SERVER['DOCUMENT_ROOT'] . '/SAFEProject/controller/AuthController.php';
-if (file_exists($controller_path)) {
-    require_once $controller_path;
-} else {
-    require_once __DIR__ . '/../../controller/AuthController.php';
-}
 
 $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -15,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lastname = trim($_POST['lastname']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-    $role = trim($_POST['role'] ?? 'membre');
+    $role = trim($_POST['role']);
 
     // Validation des champs
     if (empty($firstname) || empty($lastname)) {
