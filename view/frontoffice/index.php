@@ -82,81 +82,113 @@ function getUserFullnameById($userId, $userController) {
 </head>
 <body class="is-preload">
 
-<div id="page-wrapper">
-    <header id="header">
-        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <a class="navbar-brand nav-logo text-primary" href="index.php" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                    <img src="images/logo.png" alt="SafeSpace Logo" style="height: 40px; width: auto;">
-                    <h1 style="margin: 0; font-size: 1.5em;">SafeSpace</h1>
-                </a>
-            </div>
-           
-            <nav>
-                <a href="index.php">Accueil</a> |
+<div id="page-wrapper" class="page-shell">
+    <header id="header" class="frosted-bar">
+        <div class="header-inner">
+            <a class="navbar-brand nav-logo text-primary" href="index.php" aria-label="Retour à l'accueil">
+                <img src="images/logo.png" alt="SafeSpace Logo" class="brand-logo">
+                <div>
+                    <p class="eyebrow">Espace bienveillant</p>
+                    <h1 class="brand-title">SafeSpace</h1>
+                </div>
+            </a>
+
+            <nav class="nav-links" aria-label="Navigation principale">
+                <a href="index.php" class="nav-link">Accueil</a>
                 <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                    <a href="../backoffice/index.php">Dashboard</a> |
+                    <a href="../backoffice/index.php" class="nav-link">Dashboard</a>
                 <?php endif; ?>
                 <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'conseilleur'): ?>
-                    <a href="../backoffice/adviser_dashboard.php">Tableau de bord</a> |
+                    <a href="../backoffice/adviser_dashboard.php" class="nav-link">Tableau de bord</a>
                 <?php endif; ?>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="profile.php">Profil</a> |
-                    <a href="logout.php">Déconnexion</a>
+                    <a href="profile.php" class="nav-link">Profil</a>
+                    <a href="logout.php" class="nav-link">Déconnexion</a>
                 <?php else: ?>
-                    <a href="login.php">Connexion</a> |
-                    <a href="register.php">Inscription</a>
+                    <a href="login.php" class="nav-link">Connexion</a>
+                    <a href="register.php" class="nav-link accent">Inscription</a>
                 <?php endif; ?>
             </nav>
         </div>
     </header>
 
     <section id="wrapper">
-        <header>
+        <header class="hero">
             <div class="inner">
-                <h2>Bienvenue sur SafeSpace</h2>
-                <p>Envie de libérer vos émotions ? Partagez vos pensées en toute sécurité.</p>
-                
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <div class="welcome-message">
-                        <h3>Bienvenue, <?= htmlspecialchars($_SESSION['fullname'] ?? 'Utilisateur') ?> !</h3>
-                        <p>Votre rôle: <?= htmlspecialchars($_SESSION['user_role'] ?? 'Membre') ?></p>
+                <div class="hero-grid">
+                    <div>
+                        <p class="pill">Communauté positive</p>
+                        <h2>Bienvenue sur SafeSpace</h2>
+                        <p>Envie de libérer vos émotions ? Partagez vos pensées en toute sécurité et découvrez des ressources adaptées.</p>
+
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <div class="welcome-card">
+                                <h3>Bonjour, <?= htmlspecialchars($_SESSION['fullname'] ?? 'Utilisateur') ?> 👋</h3>
+                                <p>Rôle: <?= htmlspecialchars($_SESSION['user_role'] ?? 'Membre') ?></p>
+                                <div class="hero-actions">
+                                    <a href="addPost.php" class="button primary">Partager un post</a>
+                                    <a href="#articles" class="button subtle">Voir les articles</a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="hero-actions">
+                                <a href="register.php" class="button primary">S'inscrire</a>
+                                <a href="login.php" class="button">Se connecter</a>
+                            </div>
+                        <?php endif; ?>
                     </div>
-                <?php else: ?>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <a href="register.php" class="button primary" style="margin-right: 10px;">S'inscrire</a>
-                        <a href="login.php" class="button">Se connecter</a>
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <p class="label">Articles validés</p>
+                            <p class="value"><?php echo $articleCount; ?></p>
+                            <p class="hint">contenus vérifiés par l'équipe</p>
+                        </div>
+                        <div class="stat-card">
+                            <p class="label">Soutien actif</p>
+                            <p class="value">24/7</p>
+                            <p class="hint">Réponses bienveillantes</p>
+                        </div>
+                        <div class="stat-card">
+                            <p class="label">Communauté</p>
+                            <p class="value"><?php echo count($list_Post); ?>+</p>
+                            <p class="hint">partages inspirants</p>
+                        </div>
                     </div>
-                <?php endif; ?>
+                </div>
             </div>
         </header>
 
         <div class="wrapper">
             <div class="inner">
-                <section class="features">
-                    <div class="feature">
-                        <h3 class="major">🔒 Sécurisé</h3>
-                        <p>Vos données sont protégées et votre anonymat préservé</p>
+                <section class="features feature-grid">
+                    <div class="feature feature-card">
+                        <div class="icon-badge">🔒</div>
+                        <h3 class="major">Sécurisé</h3>
+                        <p>Vos données sont protégées et votre anonymat préservé.</p>
                     </div>
-                    <div class="feature">
-                        <h3 class="major">🤝 Bienveillant</h3>
-                        <p>Une communauté respectueuse et à l'écoute</p>
+                    <div class="feature feature-card">
+                        <div class="icon-badge">🤝</div>
+                        <h3 class="major">Bienveillant</h3>
+                        <p>Une communauté respectueuse et à l'écoute.</p>
                     </div>
-                    <div class="feature">
-                        <h3 class="major">💬 Libre</h3>
-                        <p>Exprimez-vous sans jugement dans un espace safe</p>
+                    <div class="feature feature-card">
+                        <div class="icon-badge">💬</div>
+                        <h3 class="major">Libre</h3>
+                        <p>Exprimez-vous sans jugement dans un espace safe.</p>
                     </div>
                 </section>
-                <section class="articles-section">
-                    <div style="display:flex; align-items:center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+
+                <section class="articles-section" id="articles">
+                    <div class="section-header">
                         <div>
-                            <p class="pill" style="display:inline-block; margin-bottom:8px;">📚 <?php echo $articleCount; ?> article<?php echo $articleCount > 1 ? 's' : ''; ?> approuvés</p>
-                            <h2 style="margin:0;">Articles approuvés</h2>
+                            <p class="pill">📚 <?php echo $articleCount; ?> article<?php echo $articleCount > 1 ? 's' : ''; ?> approuvés</p>
+                            <h2>Articles approuvés</h2>
+                            <p class="hint">Filtrez par catégorie ou mot-clé pour trouver rapidement ce dont vous avez besoin.</p>
                         </div>
-                        <div style="display:flex; gap:10px; flex-wrap: wrap; align-items:center;">
-                            <form method="GET" style="display:flex; gap:8px; flex-wrap: wrap;">
-                                <input type="text" name="q" placeholder="Rechercher un titre ou une idée" value="<?php echo htmlspecialchars($articleSearch); ?>" style="padding:8px 10px; border-radius: 8px; border: 1px solid #ddd; min-width:220px;">
-                                <select name="category" style="padding:8px 10px; border-radius: 8px; border: 1px solid #ddd; min-width: 180px;">
+                        <div class="filter-bar">
+                            <form method="GET" class="filter-form">
+                                <input type="text" name="q" placeholder="Rechercher un titre ou une idée" value="<?php echo htmlspecialchars($articleSearch); ?>">
+                                <select name="category">
                                     <option value="0">Toutes les catégories</option>
                                     <?php foreach ($categories as $cat): ?>
                                         <option value="<?php echo $cat['id_categorie']; ?>" <?php echo $selectedCategory === (int)$cat['id_categorie'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['nom_categorie']); ?></option>
@@ -164,10 +196,10 @@ function getUserFullnameById($userId, $userController) {
                                 </select>
                                 <button class="button primary" type="submit">Filtrer</button>
                                 <?php if ($selectedCategory || $articleSearch !== ''): ?>
-                                    <a class="button" href="index.php">Réinitialiser</a>
+                                    <a class="button subtle" href="index.php">Réinitialiser</a>
                                 <?php endif; ?>
                             </form>
-                            <div>
+                            <div class="filter-actions">
                                 <a class="button" href="article_detail.php">Découvrir</a>
                                 <?php if (isset($_SESSION['user_id'])): ?>
                                     <a class="button primary" href="addArticle.php">Proposer un article</a>
@@ -177,159 +209,157 @@ function getUserFullnameById($userId, $userController) {
                             </div>
                         </div>
                     </div>
-                    <div class="comments-section">
+                    <div class="card-grid">
                         <?php if (!$articles): ?>
-                            <div class="comment-item" style="text-align:center;">Aucun article ne correspond à vos filtres. Essayez une autre recherche.</div>
+                            <div class="empty-card">Aucun article ne correspond à vos filtres. Essayez une autre recherche.</div>
                         <?php endif; ?>
-                        <ul class="comments-list">
-                            <?php foreach ($articles as $article): ?>
-                                <?php
-                                $cat = $categorieC->getCategorie((int)$article['id_categorie']);
-                                $categoryName = $cat['nom_categorie'] ?? 'Non classé';
-                                $counts = $reactionC->countReactionsByArticle((int)$article['id_article']);
-                                ?>
-                                <li class="comment-item">
-                                    <div class="comment-header">
-                                        <span class="author"><?php echo htmlspecialchars($categoryName); ?></span>
-                                        <span class="time"><?php echo htmlspecialchars($article['date_creation']); ?></span>
-                                    </div>
-                                    <div class="message"><strong><?php echo htmlspecialchars($article['titre']); ?></strong><br><?php echo nl2br(htmlspecialchars(substr($article['contenu'],0,160))); ?>...</div>
-                                    <div class="comment-footer">
-                                        <div class="comment-actions" style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
-                                            <a class="button" href="article_detail.php?id=<?php echo $article['id_article']; ?>">Lire l'article</a>
-                                            <span class="id">👍 <?php echo $counts['like'] ?? 0; ?> | 👎 <?php echo $counts['dislike'] ?? 0; ?></span>
-                                        </div>
-                                    </div>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
+                        <?php foreach ($articles as $article): ?>
+                            <?php
+                            $cat = $categorieC->getCategorie((int)$article['id_categorie']);
+                            $categoryName = $cat['nom_categorie'] ?? 'Non classé';
+                            $counts = $reactionC->countReactionsByArticle((int)$article['id_article']);
+                            ?>
+                            <article class="card">
+                                <div class="card-header">
+                                    <span class="pill light"><?php echo htmlspecialchars($categoryName); ?></span>
+                                    <span class="time"><?php echo htmlspecialchars($article['date_creation']); ?></span>
+                                </div>
+                                <h3><?php echo htmlspecialchars($article['titre']); ?></h3>
+                                <p><?php echo nl2br(htmlspecialchars(substr($article['contenu'],0,160))); ?>...</p>
+                                <div class="card-footer">
+                                    <div class="reactions">👍 <?php echo $counts['like'] ?? 0; ?> · 👎 <?php echo $counts['dislike'] ?? 0; ?></div>
+                                    <a class="button ghost" href="article_detail.php?id=<?php echo $article['id_article']; ?>">Lire l'article</a>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
                     </div>
                 </section>
-                <!-- Section Postes approuvees -->
-                <div class="comments-section">
-                    <h2>les Postes approuvees</h2>
-                    <ul class="comments-list">
+
+                <section class="comments-section posts-section">
+                    <div class="section-header">
+                        <div>
+                            <p class="pill">Communauté</p>
+                            <h2>Les posts approuvés</h2>
+                            <p class="hint">Explorez les partages récents et rejoignez la conversation.</p>
+                        </div>
+                        <div class="filter-actions">
+                            <a class="button primary" href="AjoutPost.php">Publier un post</a>
+                            <a class="button subtle" href="addCom.php">Réagir</a>
+                        </div>
+                    </div>
+                    <ul class="comments-list modern">
                         <?php
                         foreach($list_Post as $post){
-                            // Get user fullname instead of showing id_user
                             $userFullname = getUserFullnameById($post['id_user'], $userController);
                         ?>
-                        <li class="comment-item">
+                        <li class="comment-item enhanced">
                             <div class="comment-header">
-                                <span class="author"><?php echo htmlspecialchars($userFullname); ?></span>
-                                <span class="author"><?php echo htmlspecialchars($post['author']); ?></span>
+                                <div class="author-stack">
+                                    <span class="author"><?php echo htmlspecialchars($userFullname); ?></span>
+                                    <span class="sub">par <?php echo htmlspecialchars($post['author']); ?></span>
+                                </div>
                                 <span class="time"><?php echo htmlspecialchars($post['time']); ?></span>
                             </div>
-                            
+
                             <div class="message"><?php echo nl2br(htmlspecialchars($post['message'])); ?></div>
-                            
-                            <!-- Image Display Section -->
+
                             <?php if (!empty($post['image']) && file_exists($post['image'])): ?>
                                 <div class="image-container">
-                                    <img src="<?php echo htmlspecialchars($post['image']); ?>" 
-                                        alt="Post image" 
+                                    <img src="<?php echo htmlspecialchars($post['image']); ?>"
+                                        alt="Illustration du post"
                                         class="post-image"
                                         onerror="this.style.display='none'">
                                 </div>
                             <?php elseif (!empty($post['image'])): ?>
-                                <div class="no-image">
-                                    Image not found: <?php echo htmlspecialchars(basename($post['image'])); ?>
-                                </div>
+                                <div class="no-image">Image introuvable : <?php echo htmlspecialchars(basename($post['image'])); ?></div>
                             <?php else: ?>
-                                <div class="no-image">No image</div>
+                                <div class="no-image">Pas d'image</div>
                             <?php endif; ?>
-                            
+
                             <div class="comment-footer">
                                 <span class="id">ID: <?php echo $post['id']; ?></span>
                                 <div class="comment-actions">
-                                    <!-- You can add other actions here -->
-                    
-                                    <button class="btn-respond" onclick="window.location.href='addCom.php?id=<?=$post['id']; ?>'">
-                                        Ajouter Commentaire
+                                    <button class="button ghost" onclick="window.location.href='addCom.php?id=<?=$post['id']; ?>'">
+                                        Ajouter un commentaire
                                     </button>
                                     <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                                        <button class="btn-update" onclick="window.location.href='modifierPost.php?id=<?=$post['id']; ?>&author=<?=$post['author']; ?>&message=<?=$post['message']; ?>'">
-                                            Modifier Post
+                                        <button class="button subtle" onclick="window.location.href='modifierPost.php?id=<?=$post['id']; ?>&author=<?=$post['author']; ?>&message=<?=$post['message']; ?>'">
+                                            Modifier
                                         </button>
-                                        <button class="btn-delete" onclick="window.location.href='deletePost.php?id=<?=$post['id']; ?>'">
-                                            Supprimer Post
+                                        <button class="button danger" onclick="window.location.href='deletePost.php?id=<?=$post['id']; ?>'">
+                                            Supprimer
                                         </button>
                                     <?php endif; ?>
                                 </div>
+                            </div>
+
+                            <div class="response-section">
+                                <h3>Commentaires</h3>
+                                <ul class="response-list">
+                                    <?php
+                                    $list_Com = $cc->listComment($post['id']);
+                                    foreach($list_Com as $comment){
+                                    ?>
+                                    <li class="response-item">
+                                        <div class="response-header">
+                                            <span class="author"><?php echo htmlspecialchars($comment['author']); ?></span>
+                                            <span class="time"><?php echo htmlspecialchars($comment['time']); ?></span>
+                                        </div>
+                                        <div class="message"><?php echo htmlspecialchars($comment['message']); ?></div>
+                                        <div class="comment-footer">
+                                            <span class="id">ID: <?php echo $comment['id']; ?></span>
+                                            <div class="response-actions">
+                                                <button class="button ghost" onclick="window.location.href='addRes.php?id_Com=<?=$comment['id']; ?>&id_post=<?=$comment['id_post']; ?>'">
+                                                    Répondre
+                                                </button>
+                                                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                                    <button class="button danger" onclick="window.location.href='deleteCom.php?id=<?=$comment['id']; ?>'">
+                                                        Supprimer
+                                                    </button>
+                                                    <button class="button subtle" onclick="window.location.href='modifierCom.php?id=<?=$comment['id']; ?>&id_post=<?=$comment['id_post']; ?>&author=<?=$comment['author']; ?>&message=<?=$comment['message']; ?>'">
+                                                        Modifier
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <div class="response-section nested">
+                                            <h4>Réponses</h4>
+                                            <ul class="response-list">
+                                                <?php
+                                                $list_Res = $rc->listRespond($comment['id']);
+                                                foreach($list_Res as $respond){
+                                                ?>
+                                                <li class="response-item">
+                                                    <div class="response-header">
+                                                        <span class="author"><?php echo htmlspecialchars($respond['author']); ?></span>
+                                                        <span class="time"><?php echo htmlspecialchars($respond['time']); ?></span>
+                                                    </div>
+                                                    <div class="message"><?php echo htmlspecialchars($respond['message']); ?></div>
+                                                    <div class="comment-footer">
+                                                        <span class="id">ID: <?php echo $respond['id']; ?></span>
+                                                        <div class="response-actions">
+                                                        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                                            <button class="button danger" onclick="window.location.href='deleteRes.php?id=<?=$respond['id']; ?>'">
+                                                                Supprimer
+                                                            </button>
+                                                            <button class="button subtle" onclick="window.location.href='modifierRes.php?id=<?=$respond['id']; ?>&id_post=<?=$respond['id_post']; ?>&id_com=<?=$respond['id_com']; ?>&author=<?=$respond['author']; ?>&message=<?=$respond['message']; ?>'">
+                                                                Modifier
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <?php } ?>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                    <?php } ?>
+                                </ul>
                             </div>
                         </li>
-                    <!-- comments-list -->
-                    <div class="response-section">
-                        <h3>les Commentaires</h3>
-                        <ul class="response-list">
-                            <?php
-                            
-                            $list_Com = $cc->listComment($post['id']);
-                            foreach($list_Com as $comment){
-                            ?>
-                            <li class="response-item">
-                                <div class="response-header">
-                                    <span class="author"><?php echo htmlspecialchars($comment['author']); ?></span>
-                                    <span class="time"><?php echo htmlspecialchars($comment['time']); ?></span>
-                                </div>
-                                <div class="message"><?php echo htmlspecialchars($comment['message']); ?></div>
-                                <div class="comment-footer">
-                                <span class="id">ID: <?php echo $comment['id']; ?></span>
-                                <div class="response-actions">
-                                    
-                                    <button class="btn-respond" onclick="window.location.href='addRes.php?id_Com=<?=$comment['id']; ?>&id_post=<?=$comment['id_post']; ?>'">
-                                        Ajouter Reponse
-                                    </button>
-                                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                                        <button class="btn-delete" onclick="window.location.href='deleteCom.php?id=<?=$comment['id']; ?>'">
-                                            Supprimer Commentaire
-                                        </button>
-                                        <button class="btn-update" onclick="window.location.href='modifierCom.php?id=<?=$comment['id']; ?>&id_post=<?=$comment['id_post']; ?>&author=<?=$comment['author']; ?>&message=<?=$comment['message']; ?>'">
-                                            Modifier Commentaire
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            </li>
-                    <!-- respond-list -->
-                    <div class="response-section">
-                        <h3>les Reponses</h3>
-                        <ul class="response-list">
-                            <?php
-                            
-                            $list_Res = $rc->listRespond($comment['id']);
-                            foreach($list_Res as $respond){
-                            ?>
-                            <li class="response-item">
-                                <div class="response-header">
-                                    <span class="author"><?php echo htmlspecialchars($respond['author']); ?></span>
-                                    <span class="time"><?php echo htmlspecialchars($respond['time']); ?></span>
-                                </div>
-                                <div class="message"><?php echo htmlspecialchars($respond['message']); ?></div>
-                                <div class="comment-footer">
-                                <span class="id">ID: <?php echo $respond['id']; ?></span>
-                                <div class="response-actions">
-                                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-                                    <button class="btn-delete" onclick="window.location.href='deleteRes.php?id=<?=$respond['id']; ?>'">
-                                        Supprimer
-                                    </button>
-                                    <button class="btn-update" onclick="window.location.href='modifierRes.php?id=<?=$respond['id']; ?>&id_post=<?=$respond['id_post']; ?>&id_com=<?=$respond['id_com']; ?>&author=<?=$respond['author']; ?>&message=<?=$respond['message']; ?>'">
-                                        Modifier
-                                    </button>
-                                <?php endif; ?>
-                                </div>
-                            </div>
-                            </li>
-                            <?php } ?>    
-                        </ul>
-                    </div>
-                            <?php } ?>    
-                        </ul>
-                    </div>
-                        <?php } ?>    
+                        <?php } ?>
                     </ul>
-                </div>
-                <!-- fin section posts -->
+                </section>
             </div>
         </div>
     </section>
