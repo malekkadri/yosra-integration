@@ -1,4 +1,6 @@
 <?php
+// Prevent redeclaration issues when the file is included multiple times
+if (!class_exists('User')) {
 class User {
     private $id;
     private $nom;
@@ -57,5 +59,6 @@ class User {
     public function setSpecialite($specialite) { $this->specialite = $specialite; return $this; }
     public function setCreatedAt($created_at) { $this->created_at = $created_at; return $this; }
     public function setUpdatedAt($updated_at) { $this->updated_at = $updated_at; return $this; }
+}
 }
 ?>
