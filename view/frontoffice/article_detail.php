@@ -48,6 +48,15 @@ if ($currentArticle && $_SERVER['REQUEST_METHOD'] === 'POST') {
 $comments = $currentArticle ? $commentC->listCommentsByArticle((int)$currentArticle['id_article']) : [];
 $reactionCounts = $currentArticle ? $reactionC->countReactionsByArticle((int)$currentArticle['id_article']) : ['like' => 0, 'dislike' => 0];
 $userReaction = ($currentArticle && isset($_SESSION['user_id'])) ? $reactionC->userHasReacted((int)$currentArticle['id_article'], (int)$_SESSION['user_id']) : null;
+$commentCount = count($comments);
+
+$relatedArticles = [];
+if ($currentArticle) {
+    $relatedArticles = array_values(array_filter($articles, function ($article) use ($currentArticle) {
+        return $article['id_article'] !== $currentArticle['id_article'] && $article['id_categorie'] === $currentArticle['id_categorie'];
+    }));
+    $relatedArticles = array_slice($relatedArticles, 0, 4);
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -172,6 +181,13 @@ $userReaction = ($currentArticle && isset($_SESSION['user_id'])) ? $reactionC->u
             <div class="hero-banner">
                 <h1 style="margin: 0 0 6px 0;">Articles SafeSpace</h1>
                 <p style="color:#e0f7fa; margin:0;">Découvrez, réagissez et partagez vos idées dans un espace chaleureux.</p>
+                <?php if ($currentArticle): ?>
+                    <div class="meta-row" style="margin-top:10px;">
+                        <span class="pill">👍 <?php echo $reactionCounts['like'] ?? 0; ?> • 👎 <?php echo $reactionCounts['dislike'] ?? 0; ?></span>
+                        <span class="pill">💬 <?php echo $commentCount; ?> commentaire<?php echo $commentCount > 1 ? 's' : ''; ?></span>
+                        <a class="pill" href="#commentaires">Aller aux commentaires ↓</a>
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="content-grid">
                 <aside class="sidebar-card">
@@ -181,6 +197,15 @@ $userReaction = ($currentArticle && isset($_SESSION['user_id'])) ? $reactionC->u
                             <li><a href="article_detail.php?id=<?php echo $art['id_article']; ?>"><?php echo htmlspecialchars($art['titre']); ?></a></li>
                         <?php endforeach; ?>
                     </ul>
+                    <?php if ($relatedArticles): ?>
+                        <hr>
+                        <h4 style="margin: 12px 0 8px;">Dans la même catégorie</h4>
+                        <ul>
+                            <?php foreach ($relatedArticles as $related): ?>
+                                <li><a href="article_detail.php?id=<?php echo $related['id_article']; ?>"><?php echo htmlspecialchars($related['titre']); ?></a></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
                 </aside>
                 <main>
                     <?php if ($currentArticle): ?>
@@ -191,6 +216,7 @@ $userReaction = ($currentArticle && isset($_SESSION['user_id'])) ? $reactionC->u
                                 <div class="meta-row">
                                     <span class="pill">Catégorie : <?php echo htmlspecialchars($cat['nom_categorie'] ?? ''); ?></span>
                                     <span class="pill">Publié le <?php echo htmlspecialchars($currentArticle['date_creation']); ?></span>
+                                    <span class="pill">💬 <?php echo $commentCount; ?></span>
                                 </div>
                             </header>
 
@@ -217,7 +243,7 @@ $userReaction = ($currentArticle && isset($_SESSION['user_id'])) ? $reactionC->u
                                 <?php endif; ?>
                             </div>
 
-                            <div class="comments-section">
+                            <div class="comments-section" id="commentaires">
                                 <h3>Commentaires</h3>
                                 <?php if (isset($_SESSION['user_id'])): ?>
                                     <form method="POST" style="margin-bottom:15px;">

@@ -37,6 +37,10 @@ if ($search) {
     });
 }
 
+usort($comments, function ($a, $b) {
+    return strcmp($b['date_comment'], $a['date_comment']);
+});
+
 $totalComments = count($comments);
 ?>
 <!DOCTYPE html>
@@ -107,6 +111,7 @@ $totalComments = count($comments);
                                 <td>
                                     <div class="font-weight-bold"><?php echo htmlspecialchars($comment['titre'] ?? ($articlesById[$comment['id_article']] ?? '')); ?></div>
                                     <div class="text-muted small">ID article: <?php echo htmlspecialchars($comment['id_article']); ?></div>
+                                    <a class="btn btn-sm btn-outline-secondary mt-1" target="_blank" href="../frontoffice/article_detail.php?id=<?php echo $comment['id_article']; ?>"><i class="fas fa-external-link-alt mr-1"></i>Ouvrir</a>
                                 </td>
                                 <td><?php echo htmlspecialchars($comment['id_user']); ?></td>
                                 <td>

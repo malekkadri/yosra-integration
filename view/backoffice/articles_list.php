@@ -229,6 +229,21 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                 </div>
             </div>
 
+            <div class="alert alert-info d-flex align-items-center justify-content-between flex-wrap" role="alert">
+                <div>
+                    <strong>Filtres actifs :</strong>
+                    <span class="badge badge-primary mr-2">Statut : <?php echo htmlspecialchars($statusFilter); ?></span>
+                    <span class="badge badge-secondary mr-2">Catégorie : <?php echo $categoryFilter ? htmlspecialchars($categoryFilter) : 'Toutes'; ?></span>
+                    <?php if ($searchQuery): ?><span class="badge badge-light">Recherche : "<?php echo htmlspecialchars($searchQuery); ?>"</span><?php endif; ?>
+                </div>
+                <div class="d-flex flex-wrap align-items-center" style="gap:6px;">
+                    <a class="btn btn-sm btn-outline-primary" href="?status=approved"><i class="fas fa-check mr-1"></i>Approuvés</a>
+                    <a class="btn btn-sm btn-outline-warning" href="?status=pending"><i class="fas fa-hourglass-half mr-1"></i>En attente</a>
+                    <a class="btn btn-sm btn-outline-danger" href="?status=rejected"><i class="fas fa-times mr-1"></i>Rejetés</a>
+                    <a class="btn btn-sm btn-light" href="articles_list.php"><i class="fas fa-broom mr-1"></i>Réinitialiser</a>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-lg-5">
                     <div class="card shadow mb-4">
@@ -355,6 +370,7 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                                         <td class="text-right">
                                             <div class="btn-group" role="group">
                                                 <a class="btn btn-sm btn-outline-info" href="?action=edit&id=<?php echo $article['id_article']; ?>"><i class="fas fa-edit"></i></a>
+                                                <a class="btn btn-sm btn-outline-secondary" href="../frontoffice/article_detail.php?id=<?php echo $article['id_article']; ?>" target="_blank" title="Voir sur le site"><i class="fas fa-external-link-alt"></i></a>
                                                 <a class="btn btn-sm btn-outline-success" href="?action=approve&id=<?php echo $article['id_article']; ?>" title="Approuver"><i class="fas fa-check"></i></a>
                                                 <a class="btn btn-sm btn-outline-warning" href="?action=reject&id=<?php echo $article['id_article']; ?>" title="Rejeter"><i class="fas fa-times"></i></a>
                                                 <a class="btn btn-sm btn-outline-danger" href="?action=delete&id=<?php echo $article['id_article']; ?>" onclick="return confirm('Supprimer cet article ?');" title="Supprimer"><i class="fas fa-trash"></i></a>
