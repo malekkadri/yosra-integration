@@ -102,6 +102,34 @@ try {
                 <span>Utilisateurs</span></a>
         </li>
 
+        <!-- Nav Item - Posts -->
+        <li class="nav-item">
+            <a class="nav-link" href="posts_list.php">
+                <i class="fas fa-fw fa-comment"></i>
+                <span>Posts</span></a>
+        </li>
+
+        <!-- Nav Item - Articles -->
+        <li class="nav-item">
+            <a class="nav-link" href="articles_list.php">
+                <i class="fas fa-fw fa-newspaper"></i>
+                <span>Articles</span></a>
+        </li>
+
+        <!-- Nav Item - Categories -->
+        <li class="nav-item">
+            <a class="nav-link" href="categories_list.php">
+                <i class="fas fa-fw fa-folder-open"></i>
+                <span>Catégories</span></a>
+        </li>
+
+        <!-- Nav Item - Article Comments -->
+        <li class="nav-item">
+            <a class="nav-link" href="comment_articles_list.php">
+                <i class="fas fa-fw fa-comments"></i>
+                <span>Commentaires d'articles</span></a>
+        </li>
+
         <!-- Divider -->
         <hr class="sidebar-divider">
 

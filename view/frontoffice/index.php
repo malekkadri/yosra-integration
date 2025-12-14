@@ -24,12 +24,21 @@ $users = $userController->listUsers();
 include '../../controller/PostC.php';
 include '../../controller/CommentC.php';
 include '../../controller/RespondC.php';
+include '../../controller/ArticleC.php';
+include '../../controller/CategorieC.php';
+include '../../controller/ReactionC.php';
+include '../../controller/CommentArticleC.php';
 
 $pc = new PostC();
 $list_Post = $pc->listPostProuver();
 
 $cc = new CommentC();
 $rc = new RespondC();
+$articleC = new ArticleC();
+$categorieC = new CategorieC();
+$reactionC = new ReactionC();
+$commentArticleC = new CommentArticleC();
+$articles = $articleC->listArticles('approved');
 
 // Create a function to get user fullname by ID
 function getUserFullnameById($userId, $userController) {
@@ -118,6 +127,43 @@ function getUserFullnameById($userId, $userController) {
                     <div class="feature">
                         <h3 class="major">💬 Libre</h3>
                         <p>Exprimez-vous sans jugement dans un espace safe</p>
+                    </div>
+                </section>
+                <section class="articles-section">
+                    <div style="display:flex; align-items:center; justify-content: space-between;">
+                        <h2>Articles approuvés</h2>
+                        <div>
+                            <a class="button" href="article_detail.php">Découvrir</a>
+                            <?php if (isset($_SESSION['user_id'])): ?>
+                                <a class="button primary" href="addArticle.php">Proposer un article</a>
+                            <?php else: ?>
+                                <a class="button" href="login.php">Connectez-vous pour proposer</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="comments-section">
+                        <ul class="comments-list">
+                            <?php foreach ($articles as $article): ?>
+                                <?php
+                                $cat = $categorieC->getCategorie((int)$article['id_categorie']);
+                                $categoryName = $cat['nom_categorie'] ?? 'Non classé';
+                                $counts = $reactionC->countReactionsByArticle((int)$article['id_article']);
+                                ?>
+                                <li class="comment-item">
+                                    <div class="comment-header">
+                                        <span class="author"><?php echo htmlspecialchars($categoryName); ?></span>
+                                        <span class="time"><?php echo htmlspecialchars($article['date_creation']); ?></span>
+                                    </div>
+                                    <div class="message"><strong><?php echo htmlspecialchars($article['titre']); ?></strong><br><?php echo nl2br(htmlspecialchars(substr($article['contenu'],0,160))); ?>...</div>
+                                    <div class="comment-footer">
+                                        <div class="comment-actions">
+                                            <a class="button" href="article_detail.php?id=<?php echo $article['id_article']; ?>">Lire l'article</a>
+                                            <span class="id">👍 <?php echo $counts['like'] ?? 0; ?> | 👎 <?php echo $counts['dislike'] ?? 0; ?></span>
+                                        </div>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
                     </div>
                 </section>
                 <!-- Section Postes approuvees -->
