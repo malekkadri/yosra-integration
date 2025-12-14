@@ -1,0 +1,152 @@
+[2025-12-13 16:06:49] 📝 NOUVEAU POST - Auteur: 
+[2025-12-13 16:06:49] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 16:06:49] Texte à analyser:  | ...
+[2025-12-13 16:06:49] ❌ ERREUR: Clé API trop courte (API KEY HEEEEEEEAAAAAAAR)
+[2025-12-13 16:06:49] 📌 Une vraie clé fait environ 39 caractères
+[2025-12-13 16:06:49] Résultat final: ERREUR_API
+[2025-12-13 16:06:49] POST REJETÉ - Erreur API
+[2025-12-13 16:18:53] 📝 NOUVEAU POST - Auteur: first Ala post 
+[2025-12-13 16:18:53] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 16:18:53] Texte à analyser: first Ala post  | first post...
+[2025-12-13 16:18:53] ❌ ERREUR: Clé API trop courte (API KEY HEEEEEEEAAAAAAAR)
+[2025-12-13 16:18:53] 📌 Une vraie clé fait environ 39 caractères
+[2025-12-13 16:18:53] Résultat final: ERREUR_API
+[2025-12-13 16:18:53] POST REJETÉ - Erreur API
+[2025-12-13 16:21:57] 📝 NOUVEAU POST - Auteur: ala
+[2025-12-13 16:21:57] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 16:21:57] Texte à analyser: ala | dsfd...
+[2025-12-13 16:21:57] ❌ ERREUR: Clé API trop courte (API KEY HEEEEEEEAAAAAAAR)
+[2025-12-13 16:21:57] 📌 Une vraie clé fait environ 39 caractères
+[2025-12-13 16:21:57] Résultat final: ERREUR_API
+[2025-12-13 16:21:57] POST REJETÉ - Erreur API
+[2025-12-13 16:43:38] 📝 NOUVEAU POST - Auteur: ala
+[2025-12-13 16:43:38] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 16:43:38] Texte à analyser: ala | test 1...
+[2025-12-13 16:43:38] ✅ Clé API valide
+[2025-12-13 16:43:38] ✅ curl disponible
+[2025-12-13 16:43:38] Payload JSON préparé (368 bytes)
+[2025-12-13 16:43:38] Envoi vers Gemini API...
+[2025-12-13 16:43:40] Réponse HTTP: 200
+[2025-12-13 16:43:40] ✅ JSON parsé
+[2025-12-13 16:43:40] ✅ Réponse Gemini: 'NO'
+[2025-12-13 16:43:40] ========== VÉRIFICATION TERMINÉE ==========
+
+[2025-12-13 16:43:40] Résultat final: NON
+[2025-12-13 16:43:40] POST APPROUVÉ - Contenu acceptable
+[2025-12-13 16:43:40] Image uploadée: ../uploads/693d89ac1dc22_1764948173376.jpeg
+[2025-12-13 16:43:40] ✅ Post sauvegardé en BD
+
+[2025-12-13 16:54:39] 📝 NOUVEAU POST - Auteur: ala
+[2025-12-13 16:54:39] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 16:54:39] Texte à analyser: ala | tst...
+[2025-12-13 16:54:39] ✅ Clé API valide
+[2025-12-13 16:54:39] ✅ curl disponible
+[2025-12-13 16:54:39] Payload JSON préparé (365 bytes)
+[2025-12-13 16:54:39] Envoi vers Gemini API...
+[2025-12-13 16:54:40] Réponse HTTP: 200
+[2025-12-13 16:54:40] ✅ JSON parsé
+[2025-12-13 16:54:40] ✅ Réponse Gemini: 'NO'
+[2025-12-13 16:54:40] ========== VÉRIFICATION TERMINÉE ==========
+
+[2025-12-13 16:54:40] Résultat final: NON
+[2025-12-13 16:54:40] POST APPROUVÉ - Contenu acceptable
+[2025-12-13 16:54:40] Image uploadée: ../uploads/693d8c40e2b00_capcut.png
+[2025-12-13 16:54:40] ✅ Post sauvegardé en BD
+
+[2025-12-13 17:38:17] 📝 NOUVEAU POST - Auteur: first post 
+[2025-12-13 17:38:17] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 17:38:17] Texte à analyser: first post  | first...
+[2025-12-13 17:38:17] ❌ ERREUR: Clé API trop courte (AIzaSyC8jINuXEdInD0HbRpe6WY)
+[2025-12-13 17:38:17] 📌 Une vraie clé fait environ 39 caractères
+[2025-12-13 17:38:17] Résultat final: ERREUR_API
+[2025-12-13 17:38:17] POST REJETÉ - Erreur API
+[2025-12-13 17:47:40] 📝 NOUVEAU POST - Auteur: first post 
+[2025-12-13 17:47:40] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 17:47:40] Texte à analyser: first post  | putin tu est foue ...
+[2025-12-13 17:47:40] ✅ Clé API valide
+[2025-12-13 17:47:40] ✅ curl disponible
+[2025-12-13 17:47:40] Payload JSON préparé (388 bytes)
+[2025-12-13 17:47:40] Envoi vers Gemini API...
+[2025-12-13 17:47:41] Réponse HTTP: 200
+[2025-12-13 17:47:41] ✅ JSON parsé
+[2025-12-13 17:47:41] ✅ Réponse Gemini: 'YES'
+[2025-12-13 17:47:41] ========== VÉRIFICATION TERMINÉE ==========
+
+[2025-12-13 17:47:41] Résultat final: OUI
+[2025-12-13 17:47:41] POST REJETÉ - Contenu inapproprié
+[2025-12-13 17:48:58] 📝 NOUVEAU POST - Auteur: first  positive post 
+[2025-12-13 17:48:58] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 17:48:58] Texte à analyser: first  positive post  | bonjours c est mon premier post ...
+[2025-12-13 17:48:58] ✅ Clé API valide
+[2025-12-13 17:48:58] ✅ curl disponible
+[2025-12-13 17:48:58] Payload JSON préparé (412 bytes)
+[2025-12-13 17:48:58] Envoi vers Gemini API...
+[2025-12-13 17:48:59] Réponse HTTP: 200
+[2025-12-13 17:48:59] ✅ JSON parsé
+[2025-12-13 17:48:59] ✅ Réponse Gemini: 'NO'
+[2025-12-13 17:48:59] ========== VÉRIFICATION TERMINÉE ==========
+
+[2025-12-13 17:48:59] Résultat final: NON
+[2025-12-13 17:48:59] POST APPROUVÉ - Contenu acceptable
+[2025-12-13 17:48:59] Image uploadée: ../uploads/693d98fb5ee6e_CTS-Simulator1png.jpeg
+[2025-12-13 17:48:59] ✅ Post sauvegardé en BD
+
+[2025-12-13 19:43:49] 📝 NOUVEAU POST - Auteur: first positive post 
+[2025-12-13 19:43:49] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 19:43:49] Texte à analyser: first positive post  | Bonjour a tous c est mon premier postes positive sur Safe...
+[2025-12-13 19:43:49] ✅ Clé API valide
+[2025-12-13 19:43:49] ✅ curl disponible
+[2025-12-13 19:43:49] Payload JSON préparé (442 bytes)
+[2025-12-13 19:43:49] Envoi vers Gemini API...
+[2025-12-13 19:43:50] Réponse HTTP: 200
+[2025-12-13 19:43:50] ✅ JSON parsé
+[2025-12-13 19:43:50] ✅ Réponse Gemini: 'NO'
+[2025-12-13 19:43:50] ========== VÉRIFICATION TERMINÉE ==========
+
+[2025-12-13 19:43:50] Résultat final: NON
+[2025-12-13 19:43:50] POST APPROUVÉ - Contenu acceptable
+[2025-12-13 19:43:50] Image uploadée: ../uploads/693db3e69c733_winners.jpeg
+[2025-12-13 19:43:50] ✅ Post sauvegardé en BD
+
+[2025-12-13 19:49:32] 📝 NOUVEAU POST - Auteur: negative post 
+[2025-12-13 19:49:32] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 19:49:32] Texte à analyser: negative post  | putin fuck off...
+[2025-12-13 19:49:32] ✅ Clé API valide
+[2025-12-13 19:49:32] ✅ curl disponible
+[2025-12-13 19:49:32] Payload JSON préparé (387 bytes)
+[2025-12-13 19:49:32] Envoi vers Gemini API...
+[2025-12-13 19:49:33] Réponse HTTP: 200
+[2025-12-13 19:49:33] ✅ JSON parsé
+[2025-12-13 19:49:33] ✅ Réponse Gemini: 'YES'
+[2025-12-13 19:49:33] ========== VÉRIFICATION TERMINÉE ==========
+
+[2025-12-13 19:49:33] Résultat final: OUI
+[2025-12-13 19:49:33] POST REJETÉ - Contenu inapproprié
+[2025-12-13 19:50:41] 📝 NOUVEAU POST - Auteur: second positive post 
+[2025-12-13 19:50:41] 
+========== VÉRIFICATION GEMINI LANCÉE ==========
+[2025-12-13 19:50:41] Texte à analyser: second positive post  | it is such a gratful moment in my life...
+[2025-12-13 19:50:41] ✅ Clé API valide
+[2025-12-13 19:50:41] ✅ curl disponible
+[2025-12-13 19:50:41] Payload JSON préparé (418 bytes)
+[2025-12-13 19:50:41] Envoi vers Gemini API...
+[2025-12-13 19:50:42] Réponse HTTP: 200
+[2025-12-13 19:50:42] ✅ JSON parsé
+[2025-12-13 19:50:42] ✅ Réponse Gemini: 'NO'
+[2025-12-13 19:50:42] ========== VÉRIFICATION TERMINÉE ==========
+
+[2025-12-13 19:50:42] Résultat final: NON
+[2025-12-13 19:50:42] POST APPROUVÉ - Contenu acceptable
+[2025-12-13 19:50:42] Image uploadée: ../uploads/693db58248fb8_ballon d'or.jpeg
+[2025-12-13 19:50:42] ✅ Post sauvegardé en BD
+
