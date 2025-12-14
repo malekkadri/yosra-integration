@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['article_action'])) {
     $contenu = trim($_POST['contenu'] ?? '');
     $idCategorie = (int)($_POST['id_categorie'] ?? 0);
     $imagePath = trim($_POST['image_path'] ?? '');
+    $viewCount = (int)($_POST['view_count'] ?? 0);
     $uploadDir = __DIR__ . '/../frontoffice/uploads/articles';
     $hasUploadError = false;
 
@@ -61,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['article_action'])) {
     $status = $_POST['status'] ?? 'pending';
 
     if ($titre && $contenu && $idCategorie && !$hasUploadError) {
-        $article = new Article($titre, $contenu, $idCategorie, $imagePath, null, $status, $_SESSION['user_id']);
+        $article = new Article($titre, $contenu, $idCategorie, $imagePath, null, $status, $_SESSION['user_id'], $viewCount);
         if ($_POST['article_action'] === 'create') {
             $articleC->addArticle($article);
             $message = 'Article ajouté avec succès.';
@@ -111,8 +112,16 @@ if (isset($_GET['action'], $_GET['id'])) {
 $statusFilter = $_GET['status'] ?? 'all';
 $categoryFilter = (int)($_GET['category'] ?? 0);
 $searchQuery = trim($_GET['q'] ?? '');
+$sortBy = $_GET['sort'] ?? 'recent';
 
-$articles = $articleC->listArticles($statusFilter !== 'all' ? $statusFilter : null);
+$orderBy = null;
+if ($sortBy === 'views') {
+    $orderBy = 'views';
+} elseif ($sortBy === 'title') {
+    $orderBy = 'title';
+}
+
+$articles = $articleC->listArticles($statusFilter !== 'all' ? $statusFilter : null, $orderBy);
 
 if ($categoryFilter) {
     $articles = array_filter($articles, function ($article) use ($categoryFilter) {
@@ -130,6 +139,9 @@ $totalArticles = count($articles);
 $approvedCount = count(array_filter($articles, function ($a) { return $a['status'] === 'approved'; }));
 $pendingCount = count(array_filter($articles, function ($a) { return $a['status'] === 'pending'; }));
 $rejectedCount = count(array_filter($articles, function ($a) { return $a['status'] === 'rejected'; }));
+$totalViews = array_sum(array_map(function ($article) {
+    return (int)($article['view_count'] ?? 0);
+}, $articles));
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -227,6 +239,14 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-3 mb-3">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Vues cumulées</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalViews; ?></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="alert alert-info d-flex align-items-center justify-content-between flex-wrap" role="alert">
@@ -234,6 +254,7 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                     <strong>Filtres actifs :</strong>
                     <span class="badge badge-primary mr-2">Statut : <?php echo htmlspecialchars($statusFilter); ?></span>
                     <span class="badge badge-secondary mr-2">Catégorie : <?php echo $categoryFilter ? htmlspecialchars($categoryFilter) : 'Toutes'; ?></span>
+                    <span class="badge badge-info mr-2">Tri : <?php echo htmlspecialchars($sortBy); ?></span>
                     <?php if ($searchQuery): ?><span class="badge badge-light">Recherche : "<?php echo htmlspecialchars($searchQuery); ?>"</span><?php endif; ?>
                 </div>
                 <div class="d-flex flex-wrap align-items-center" style="gap:6px;">
@@ -258,6 +279,7 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                                 <input type="hidden" name="article_action" value="<?php echo $editingArticle ? 'update' : 'create'; ?>">
                                 <?php if ($editingArticle): ?>
                                     <input type="hidden" name="id_article" value="<?php echo htmlspecialchars($editingArticle['id_article']); ?>">
+                                    <input type="hidden" name="view_count" value="<?php echo (int)($editingArticle['view_count'] ?? 0); ?>">
                                 <?php endif; ?>
                                 <div class="form-group">
                                     <label>Titre</label>
@@ -325,6 +347,11 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                                         <option value="<?php echo $cat['id_categorie']; ?>" <?php echo $categoryFilter === (int)$cat['id_categorie'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['nom_categorie']); ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                                <select name="sort" class="form-control mr-2 mb-2 filter-pill">
+                                    <option value="recent" <?php echo $sortBy === 'recent' ? 'selected' : ''; ?>>Plus récents</option>
+                                    <option value="views" <?php echo $sortBy === 'views' ? 'selected' : ''; ?>>Plus vus</option>
+                                    <option value="title" <?php echo $sortBy === 'title' ? 'selected' : ''; ?>>Titre A → Z</option>
+                                </select>
                                 <button type="submit" class="btn btn-outline-primary mb-2"><i class="fas fa-filter mr-1"></i>Filtrer</button>
                             </form>
                         </div>
@@ -337,6 +364,7 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                                         <th>Statut</th>
                                         <th>Date</th>
                                         <th>Auteur</th>
+                                        <th>Vues</th>
                                         <th class="text-right">Actions</th>
                                     </tr>
                                 </thead>
@@ -367,6 +395,7 @@ $rejectedCount = count(array_filter($articles, function ($a) { return $a['status
                                         <td><span class="status-chip <?php echo $statusClass; ?>"><?php echo htmlspecialchars($article['status']); ?></span></td>
                                         <td><span class="muted"><i class="far fa-calendar-alt mr-1"></i><?php echo htmlspecialchars($article['date_creation'] ?? ''); ?></span></td>
                                         <td><?php echo htmlspecialchars($article['author_id'] ?? ''); ?></td>
+                                        <td><span class="badge badge-info"><i class="fas fa-eye mr-1"></i><?php echo (int)($article['view_count'] ?? 0); ?></span></td>
                                         <td class="text-right">
                                             <div class="btn-group" role="group">
                                                 <a class="btn btn-sm btn-outline-info" href="?action=edit&id=<?php echo $article['id_article']; ?>"><i class="fas fa-edit"></i></a>

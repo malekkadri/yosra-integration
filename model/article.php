@@ -8,8 +8,9 @@ class Article {
     private $idCategorie; // Foreign key
     private $status;
     private $authorId;
+    private $viewCount;
 
-    public function __construct($titre, $contenu, $idCategorie, $imagePath = null, $dateCreation = null, $status = 'pending', $authorId = null) {
+    public function __construct($titre, $contenu, $idCategorie, $imagePath = null, $dateCreation = null, $status = 'pending', $authorId = null, $viewCount = 0) {
         $this->titre = $titre;
         $this->contenu = $contenu;
         $this->idCategorie = $idCategorie;
@@ -17,6 +18,7 @@ class Article {
         $this->dateCreation = $dateCreation ?? date('Y-m-d H:i:s'); // default now
         $this->status = $status;
         $this->authorId = $authorId;
+        $this->viewCount = $viewCount;
     }
 
     // GETTERS
@@ -45,6 +47,10 @@ class Article {
         return $this->authorId;
     }
 
+    public function getViewCount() {
+        return $this->viewCount;
+    }
+
     // SETTERS
     public function setTitre($titre) {
         $this->titre = $titre;
@@ -66,6 +72,10 @@ class Article {
     }
     public function setAuthorId($authorId) {
         $this->authorId = $authorId;
+    }
+
+    public function setViewCount($viewCount) {
+        $this->viewCount = $viewCount;
     }
 }
 ?>

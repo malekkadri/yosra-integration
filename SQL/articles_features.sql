@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS articles (
     image_path VARCHAR(255) DEFAULT NULL,
     date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
     status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    view_count INT UNSIGNED NOT NULL DEFAULT 0,
     author_id INT DEFAULT NULL,
     CONSTRAINT fk_article_categorie FOREIGN KEY (id_categorie) REFERENCES categories(id_categorie) ON DELETE CASCADE,
     CONSTRAINT fk_article_user FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
