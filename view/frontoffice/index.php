@@ -38,7 +38,17 @@ $articleC = new ArticleC();
 $categorieC = new CategorieC();
 $reactionC = new ReactionC();
 $commentArticleC = new CommentArticleC();
-$articles = $articleC->listArticles('approved');
+$sortBy = $_GET['sort'] ?? 'recent';
+$orderBy = null;
+if ($sortBy === 'views') {
+    $orderBy = 'views';
+} elseif ($sortBy === 'title') {
+    $orderBy = 'title';
+}
+
+$articles = $articleC->listArticles('approved', $orderBy);
+$trendingArticles = $articleC->getTopViewedArticles(3);
+$popularArticles = $articleC->getPopularArticles(3);
 $categories = $categorieC->listCategories();
 $selectedCategory = (int)($_GET['category'] ?? 0);
 $articleSearch = trim($_GET['q'] ?? '');
@@ -154,19 +164,24 @@ function getUserFullnameById($userId, $userController) {
                             <h2 style="margin:0;">Articles approuvés</h2>
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap: wrap; align-items:center;">
-                            <form method="GET" style="display:flex; gap:8px; flex-wrap: wrap;">
-                                <input type="text" name="q" placeholder="Rechercher un titre ou une idée" value="<?php echo htmlspecialchars($articleSearch); ?>" style="padding:8px 10px; border-radius: 8px; border: 1px solid #ddd; min-width:220px;">
-                                <select name="category" style="padding:8px 10px; border-radius: 8px; border: 1px solid #ddd; min-width: 180px;">
-                                    <option value="0">Toutes les catégories</option>
-                                    <?php foreach ($categories as $cat): ?>
-                                        <option value="<?php echo $cat['id_categorie']; ?>" <?php echo $selectedCategory === (int)$cat['id_categorie'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['nom_categorie']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <button class="button primary" type="submit">Filtrer</button>
-                                <?php if ($selectedCategory || $articleSearch !== ''): ?>
-                                    <a class="button" href="index.php">Réinitialiser</a>
-                                <?php endif; ?>
-                            </form>
+                              <form method="GET" style="display:flex; gap:8px; flex-wrap: wrap;">
+                                  <input type="text" name="q" placeholder="Rechercher un titre ou une idée" value="<?php echo htmlspecialchars($articleSearch); ?>" style="padding:8px 10px; border-radius: 8px; border: 1px solid #ddd; min-width:220px;">
+                                  <select name="category" style="padding:8px 10px; border-radius: 8px; border: 1px solid #ddd; min-width: 180px;">
+                                      <option value="0">Toutes les catégories</option>
+                                      <?php foreach ($categories as $cat): ?>
+                                          <option value="<?php echo $cat['id_categorie']; ?>" <?php echo $selectedCategory === (int)$cat['id_categorie'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['nom_categorie']); ?></option>
+                                      <?php endforeach; ?>
+                                  </select>
+                                  <select name="sort" style="padding:8px 10px; border-radius: 8px; border: 1px solid #ddd; min-width: 180px;">
+                                      <option value="recent" <?php echo $sortBy === 'recent' ? 'selected' : ''; ?>>Plus récents</option>
+                                      <option value="views" <?php echo $sortBy === 'views' ? 'selected' : ''; ?>>Plus consultés</option>
+                                      <option value="title" <?php echo $sortBy === 'title' ? 'selected' : ''; ?>>Titre A → Z</option>
+                                  </select>
+                                  <button class="button primary" type="submit">Filtrer</button>
+                                  <?php if ($selectedCategory || $articleSearch !== ''): ?>
+                                      <a class="button" href="index.php">Réinitialiser</a>
+                                  <?php endif; ?>
+                              </form>
                             <div>
                                 <a class="button" href="article_detail.php">Découvrir</a>
                                 <?php if (isset($_SESSION['user_id'])): ?>
@@ -176,12 +191,48 @@ function getUserFullnameById($userId, $userController) {
                                 <?php endif; ?>
                             </div>
                         </div>
-                    </div>
-                    <div class="comments-section">
-                        <?php if (!$articles): ?>
-                            <div class="comment-item" style="text-align:center;">Aucun article ne correspond à vos filtres. Essayez une autre recherche.</div>
-                        <?php endif; ?>
-                        <ul class="comments-list">
+                      </div>
+                      <?php if ($trendingArticles || $popularArticles): ?>
+                          <div class="comments-section" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+                              <?php if ($trendingArticles): ?>
+                                  <div class="comment-item">
+                                      <div class="comment-header">
+                                          <span class="author">Top vues</span>
+                                          <span class="time">En temps réel</span>
+                                      </div>
+                                      <ul>
+                                          <?php foreach ($trendingArticles as $trend): ?>
+                                              <li style="margin-bottom:6px;">
+                                                  <strong><?php echo htmlspecialchars($trend['titre']); ?></strong><br>
+                                                  <small>👁️ <?php echo (int)($trend['view_count'] ?? 0); ?> vues</small>
+                                              </li>
+                                          <?php endforeach; ?>
+                                      </ul>
+                                  </div>
+                              <?php endif; ?>
+                              <?php if ($popularArticles): ?>
+                                  <div class="comment-item">
+                                      <div class="comment-header">
+                                          <span class="author">Populaires</span>
+                                          <span class="time">Likes & réactions</span>
+                                      </div>
+                                      <ul>
+                                          <?php foreach ($popularArticles as $popular): ?>
+                                              <li style="margin-bottom:6px;">
+                                                  <strong><?php echo htmlspecialchars($popular['titre']); ?></strong><br>
+                                                  <small>👍 <?php echo (int)($popular['likes'] ?? 0); ?> • 👎 <?php echo (int)($popular['dislikes'] ?? 0); ?> • 👁️ <?php echo (int)($popular['view_count'] ?? 0); ?></small>
+                                              </li>
+                                          <?php endforeach; ?>
+                                      </ul>
+                                  </div>
+                              <?php endif; ?>
+                          </div>
+                      <?php endif; ?>
+                      <div class="comments-section">
+                          <?php if (!$articles): ?>
+                              <div class="comment-item" style="text-align:center;">Aucun article ne correspond à vos filtres. Essayez une autre recherche.</div>
+                          <?php endif; ?>
+                          <ul class="comments-list">
                             <?php foreach ($articles as $article): ?>
                                 <?php
                                 $cat = $categorieC->getCategorie((int)$article['id_categorie']);
@@ -190,17 +241,17 @@ function getUserFullnameById($userId, $userController) {
                                 ?>
                                 <li class="comment-item">
                                     <div class="comment-header">
-                                        <span class="author"><?php echo htmlspecialchars($categoryName); ?></span>
-                                        <span class="time"><?php echo htmlspecialchars($article['date_creation']); ?></span>
-                                    </div>
-                                    <div class="message"><strong><?php echo htmlspecialchars($article['titre']); ?></strong><br><?php echo nl2br(htmlspecialchars(substr($article['contenu'],0,160))); ?>...</div>
-                                    <div class="comment-footer">
-                                        <div class="comment-actions" style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
-                                            <a class="button" href="article_detail.php?id=<?php echo $article['id_article']; ?>">Lire l'article</a>
-                                            <span class="id">👍 <?php echo $counts['like'] ?? 0; ?> | 👎 <?php echo $counts['dislike'] ?? 0; ?></span>
-                                        </div>
-                                    </div>
-                                </li>
+                                          <span class="author"><?php echo htmlspecialchars($categoryName); ?></span>
+                                          <span class="time"><?php echo htmlspecialchars($article['date_creation']); ?> • 👁️ <?php echo (int)($article['view_count'] ?? 0); ?> vues</span>
+                                      </div>
+                                      <div class="message"><strong><?php echo htmlspecialchars($article['titre']); ?></strong><br><?php echo nl2br(htmlspecialchars(substr($article['contenu'],0,160))); ?>...</div>
+                                      <div class="comment-footer">
+                                          <div class="comment-actions" style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
+                                              <a class="button" href="article_detail.php?id=<?php echo $article['id_article']; ?>">Lire l'article</a>
+                                              <span class="id">👍 <?php echo $counts['like'] ?? 0; ?> | 👎 <?php echo $counts['dislike'] ?? 0; ?></span>
+                                          </div>
+                                      </div>
+                                  </li>
                             <?php endforeach; ?>
                         </ul>
                     </div>

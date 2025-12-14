@@ -15,6 +15,8 @@ $reactionC = new ReactionC();
 
 $articles = $articleC->listArticles('approved');
 $currentArticle = null;
+$trendingArticles = $articleC->getTopViewedArticles(4);
+$popularArticles = $articleC->getPopularArticles(3);
 
 if (!empty($_GET['id'])) {
     $currentArticle = $articleC->getArticle((int)$_GET['id']);
@@ -22,6 +24,18 @@ if (!empty($_GET['id'])) {
 
 if (!$currentArticle && !empty($articles)) {
     $currentArticle = $articles[0];
+}
+
+if ($currentArticle) {
+    if (!isset($_SESSION['viewed_articles'])) {
+        $_SESSION['viewed_articles'] = [];
+    }
+
+    if (empty($_SESSION['viewed_articles'][$currentArticle['id_article']])) {
+        $articleC->incrementViewCount((int)$currentArticle['id_article']);
+        $_SESSION['viewed_articles'][$currentArticle['id_article']] = true;
+        $currentArticle = $articleC->getArticle((int)$currentArticle['id_article']);
+    }
 }
 
 if ($currentArticle && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -185,6 +199,7 @@ if ($currentArticle) {
                     <div class="meta-row" style="margin-top:10px;">
                         <span class="pill">👍 <?php echo $reactionCounts['like'] ?? 0; ?> • 👎 <?php echo $reactionCounts['dislike'] ?? 0; ?></span>
                         <span class="pill">💬 <?php echo $commentCount; ?> commentaire<?php echo $commentCount > 1 ? 's' : ''; ?></span>
+                        <span class="pill">👁️ <?php echo (int)($currentArticle['view_count'] ?? 0); ?> vues</span>
                         <a class="pill" href="#commentaires">Aller aux commentaires ↓</a>
                     </div>
                 <?php endif; ?>
@@ -206,6 +221,19 @@ if ($currentArticle) {
                             <?php endforeach; ?>
                         </ul>
                     <?php endif; ?>
+
+                    <?php if ($trendingArticles): ?>
+                        <hr>
+                        <h4 style="margin: 12px 0 8px;">Plus consultés</h4>
+                        <ul>
+                            <?php foreach ($trendingArticles as $trending): ?>
+                                <li>
+                                    <a href="article_detail.php?id=<?php echo $trending['id_article']; ?>"><?php echo htmlspecialchars($trending['titre']); ?></a>
+                                    <small class="meta-row" style="display:block; color:#b0bec5;">👁️ <?php echo (int)($trending['view_count'] ?? 0); ?> vues</small>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
                 </aside>
                 <main>
                     <?php if ($currentArticle): ?>
@@ -217,6 +245,7 @@ if ($currentArticle) {
                                     <span class="pill">Catégorie : <?php echo htmlspecialchars($cat['nom_categorie'] ?? ''); ?></span>
                                     <span class="pill">Publié le <?php echo htmlspecialchars($currentArticle['date_creation']); ?></span>
                                     <span class="pill">💬 <?php echo $commentCount; ?></span>
+                                    <span class="pill">👁️ <?php echo (int)($currentArticle['view_count'] ?? 0); ?> vues</span>
                                 </div>
                             </header>
 
@@ -225,6 +254,12 @@ if ($currentArticle) {
                             <?php endif; ?>
 
                             <p><?php echo nl2br(htmlspecialchars($currentArticle['contenu'])); ?></p>
+
+                            <div class="meta-row" style="margin: 12px 0;">
+                                <span class="pill">👍 <?php echo $reactionCounts['like'] ?? 0; ?> mentions J'aime</span>
+                                <span class="pill">👎 <?php echo $reactionCounts['dislike'] ?? 0; ?> avis négatifs</span>
+                                <span class="pill">👁️ <?php echo (int)($currentArticle['view_count'] ?? 0); ?> lectures</span>
+                            </div>
 
                             <div class="comments-section">
                                 <h3>Réactions</h3>
@@ -269,6 +304,27 @@ if ($currentArticle) {
                                     <div class="empty-state">Aucun commentaire pour le moment. Soyez le premier à réagir !</div>
                                 <?php endif; ?>
                             </div>
+
+                            <?php if ($popularArticles): ?>
+                                <div class="comments-section" style="margin-top: 20px;">
+                                    <h3>Articles populaires</h3>
+                                    <div class="meta-row" style="margin-bottom: 10px;">Une sélection basée sur les likes et les vues.</div>
+                                    <ul>
+                                        <?php foreach ($popularArticles as $popular): ?>
+                                            <?php $popularCat = $categorieC->getCategorie((int)$popular['id_categorie']); ?>
+                                            <?php $popularCatName = $popularCat['nom_categorie'] ?? 'Non classé'; ?>
+                                            <li class="comment-item" style="list-style:none;">
+                                                <div class="comment-header">
+                                                    <span class="author"><?php echo htmlspecialchars($popular['titre']); ?></span>
+                                                    <span class="time">👁️ <?php echo (int)($popular['view_count'] ?? 0); ?> • 👍 <?php echo (int)($popular['likes'] ?? 0); ?></span>
+                                                </div>
+                                                <div class="message" style="margin-bottom: 6px;">Catégorie : <?php echo htmlspecialchars($popularCatName); ?> | Commentaires : <?php echo (int)($popular['comments'] ?? 0); ?></div>
+                                                <a class="button primary" href="article_detail.php?id=<?php echo $popular['id_article']; ?>">Lire</a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            <?php endif; ?>
                         </article>
                     <?php else: ?>
                         <div class="empty-state">Aucun article disponible pour le moment.</div>
