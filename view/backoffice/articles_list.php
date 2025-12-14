@@ -15,6 +15,8 @@ $categorieC = new CategorieC();
 $categories = $categorieC->listCategories();
 
 $editingArticle = null;
+$message = '';
+$messageType = 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['article_action'])) {
     $titre = trim($_POST['titre'] ?? '');
@@ -27,9 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['article_action'])) {
         $article = new Article($titre, $contenu, $idCategorie, $imagePath, null, $status, $_SESSION['user_id']);
         if ($_POST['article_action'] === 'create') {
             $articleC->addArticle($article);
+            $message = 'Article ajouté avec succès.';
         } elseif ($_POST['article_action'] === 'update' && isset($_POST['id_article'])) {
             $articleC->updateArticle((int)$_POST['id_article'], $article);
+            $message = 'Article mis à jour.';
         }
+    } else {
+        $message = 'Merci de remplir tous les champs obligatoires.';
+        $messageType = 'danger';
     }
 }
 
@@ -38,12 +45,15 @@ if (isset($_GET['action'], $_GET['id'])) {
     switch ($_GET['action']) {
         case 'delete':
             $articleC->deleteArticle($id);
+            $message = 'Article supprimé.';
             break;
         case 'approve':
             $articleC->approveArticle($id);
+            $message = 'Article approuvé !';
             break;
         case 'reject':
             $articleC->rejectArticle($id);
+            $message = 'Article rejeté.';
             break;
         case 'edit':
             $editingArticle = $articleC->getArticle($id);
@@ -51,7 +61,28 @@ if (isset($_GET['action'], $_GET['id'])) {
     }
 }
 
-$articles = $articleC->listArticles();
+$statusFilter = $_GET['status'] ?? 'all';
+$categoryFilter = (int)($_GET['category'] ?? 0);
+$searchQuery = trim($_GET['q'] ?? '');
+
+$articles = $articleC->listArticles($statusFilter !== 'all' ? $statusFilter : null);
+
+if ($categoryFilter) {
+    $articles = array_filter($articles, function ($article) use ($categoryFilter) {
+        return (int)$article['id_categorie'] === $categoryFilter;
+    });
+}
+
+if ($searchQuery) {
+    $articles = array_filter($articles, function ($article) use ($searchQuery) {
+        return stripos($article['titre'], $searchQuery) !== false || stripos($article['contenu'], $searchQuery) !== false;
+    });
+}
+
+$totalArticles = count($articles);
+$approvedCount = count(array_filter($articles, function ($a) { return $a['status'] === 'approved'; }));
+$pendingCount = count(array_filter($articles, function ($a) { return $a['status'] === 'pending'; }));
+$rejectedCount = count(array_filter($articles, function ($a) { return $a['status'] === 'rejected'; }));
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -60,6 +91,15 @@ $articles = $articleC->listArticles();
     <title>Gestion des articles</title>
     <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="assets/css/sb-admin-2.min.css" rel="stylesheet">
+    <style>
+        .status-chip { padding: 0.35rem 0.75rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .filter-pill { border-radius: 50px; padding: 0.35rem 0.9rem; }
+        .table td { vertical-align: middle; }
+        .muted { color: #6c757d; }
+    </style>
 </head>
 <body id="page-top">
 <div id="wrapper">
@@ -93,13 +133,66 @@ $articles = $articleC->listArticles();
 
     <div id="content-wrapper" class="d-flex flex-column">
         <div id="content" class="p-4">
-            <h1 class="h3 mb-4 text-gray-800">Gestion des articles</h1>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h1 class="h3 text-gray-800 mb-0">Gestion des articles</h1>
+                <a href="articles_list.php" class="btn btn-light btn-sm"><i class="fas fa-sync-alt mr-1"></i>Actualiser</a>
+            </div>
+
+            <?php if ($message): ?>
+                <div class="alert alert-<?php echo $messageType; ?> alert-dismissible fade show" role="alert">
+                    <?php echo htmlspecialchars($message); ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+
+            <div class="row mb-3">
+                <div class="col-lg-3 mb-3">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $totalArticles; ?> articles</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 mb-3">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Approuvés</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $approvedCount; ?></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 mb-3">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">En attente</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $pendingCount; ?></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 mb-3">
+                    <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Rejetés</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $rejectedCount; ?></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-lg-5">
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><?php echo $editingArticle ? 'Modifier' : 'Ajouter'; ?> un article</h6></div>
+                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary"><?php echo $editingArticle ? 'Modifier' : 'Ajouter'; ?> un article</h6>
+                            <?php if ($editingArticle): ?>
+                                <a href="articles_list.php" class="btn btn-sm btn-outline-secondary"><i class="fas fa-times mr-1"></i>Annuler</a>
+                            <?php endif; ?>
+                        </div>
                         <div class="card-body">
-                            <form method="POST">
+                            <form method="POST" class="needs-validation" novalidate>
                                 <input type="hidden" name="article_action" value="<?php echo $editingArticle ? 'update' : 'create'; ?>">
                                 <?php if ($editingArticle): ?>
                                     <input type="hidden" name="id_article" value="<?php echo htmlspecialchars($editingArticle['id_article']); ?>">
@@ -123,7 +216,10 @@ $articles = $articleC->listArticles();
                                 </div>
                                 <div class="form-group">
                                     <label>Image (chemin)</label>
-                                    <input type="text" name="image_path" class="form-control" value="<?php echo htmlspecialchars($editingArticle['image_path'] ?? ''); ?>">
+                                    <input type="text" name="image_path" class="form-control" value="<?php echo htmlspecialchars($editingArticle['image_path'] ?? ''); ?>" placeholder="/uploads/image.jpg">
+                                    <?php if (!empty($editingArticle['image_path'])): ?>
+                                        <div class="mt-2"><img src="<?php echo htmlspecialchars($editingArticle['image_path']); ?>" alt="aperçu" class="img-fluid rounded"></div>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="form-group">
                                     <label>Statut</label>
@@ -134,35 +230,83 @@ $articles = $articleC->listArticles();
                                         <option value="rejected" <?php echo $currentStatus === 'rejected' ? 'selected' : ''; ?>>Rejeté</option>
                                     </select>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>Enregistrer</button>
                             </form>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-7">
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Liste des articles</h6></div>
+                        <div class="card-header py-3 d-flex flex-wrap align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Liste des articles</h6>
+                            <form class="form-inline" method="GET">
+                                <div class="input-group mr-2 mb-2">
+                                    <input type="text" class="form-control" name="q" placeholder="Rechercher..." value="<?php echo htmlspecialchars($searchQuery); ?>">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                                    </div>
+                                </div>
+                                <select name="status" class="form-control mr-2 mb-2 filter-pill">
+                                    <option value="all" <?php echo $statusFilter === 'all' ? 'selected' : ''; ?>>Tous les statuts</option>
+                                    <option value="approved" <?php echo $statusFilter === 'approved' ? 'selected' : ''; ?>>Approuvés</option>
+                                    <option value="pending" <?php echo $statusFilter === 'pending' ? 'selected' : ''; ?>>En attente</option>
+                                    <option value="rejected" <?php echo $statusFilter === 'rejected' ? 'selected' : ''; ?>>Rejetés</option>
+                                </select>
+                                <select name="category" class="form-control mr-2 mb-2 filter-pill">
+                                    <option value="0" <?php echo !$categoryFilter ? 'selected' : ''; ?>>Toutes les catégories</option>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?php echo $cat['id_categorie']; ?>" <?php echo $categoryFilter === (int)$cat['id_categorie'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($cat['nom_categorie']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="submit" class="btn btn-outline-primary mb-2"><i class="fas fa-filter mr-1"></i>Filtrer</button>
+                            </form>
+                        </div>
                         <div class="card-body table-responsive">
-                            <table class="table table-bordered">
-                                <thead><tr><th>Titre</th><th>Catégorie</th><th>Statut</th><th>Auteur</th><th>Actions</th></tr></thead>
+                            <table class="table table-hover table-borderless align-middle">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Titre</th>
+                                        <th>Catégorie</th>
+                                        <th>Statut</th>
+                                        <th>Date</th>
+                                        <th>Auteur</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
+                                <?php if (!$articles): ?>
+                                    <tr><td colspan="6" class="text-center text-muted">Aucun article trouvé avec ces filtres.</td></tr>
+                                <?php endif; ?>
                                 <?php foreach ($articles as $article): ?>
                                     <?php
                                     $catName = '';
                                     foreach ($categories as $cat) {
-                                        if ($cat['id_categorie'] == $article['id_categorie']) { $catName = $cat['nom_categorie']; break; }
+                                        if ($cat['id_categorie'] == $article['id_categorie']) {
+                                            $catName = $cat['nom_categorie'];
+                                            break;
+                                        }
                                     }
+                                    $statusClass = $article['status'] === 'approved' ? 'status-approved' : ($article['status'] === 'rejected' ? 'status-rejected' : 'status-pending');
                                     ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($article['titre']); ?></td>
-                                        <td><?php echo htmlspecialchars($catName); ?></td>
-                                        <td><span class="badge badge-<?php echo $article['status'] === 'approved' ? 'success' : ($article['status'] === 'rejected' ? 'danger' : 'warning'); ?>"><?php echo htmlspecialchars($article['status']); ?></span></td>
-                                        <td><?php echo htmlspecialchars($article['author_id'] ?? ''); ?></td>
+                                    <tr class="shadow-sm border rounded mb-2">
                                         <td>
-                                            <a class="btn btn-sm btn-info" href="?action=edit&id=<?php echo $article['id_article']; ?>">Modifier</a>
-                                            <a class="btn btn-sm btn-success" href="?action=approve&id=<?php echo $article['id_article']; ?>">Approuver</a>
-                                            <a class="btn btn-sm btn-warning" href="?action=reject&id=<?php echo $article['id_article']; ?>">Rejeter</a>
-                                            <a class="btn btn-sm btn-danger" href="?action=delete&id=<?php echo $article['id_article']; ?>" onclick="return confirm('Supprimer cet article ?');">Supprimer</a>
+                                            <div class="font-weight-bold mb-1"><?php echo htmlspecialchars($article['titre']); ?></div>
+                                            <div class="text-muted small mb-1">#<?php echo $article['id_article']; ?> • <?php echo strlen($article['contenu']) > 80 ? htmlspecialchars(substr($article['contenu'],0,80)) . '…' : htmlspecialchars($article['contenu']); ?></div>
+                                            <?php if (!empty($article['image_path'])): ?>
+                                                <span class="badge badge-light"><i class="fas fa-image mr-1"></i>Image liée</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($catName); ?></td>
+                                        <td><span class="status-chip <?php echo $statusClass; ?>"><?php echo htmlspecialchars($article['status']); ?></span></td>
+                                        <td><span class="muted"><i class="far fa-calendar-alt mr-1"></i><?php echo htmlspecialchars($article['date_creation'] ?? ''); ?></span></td>
+                                        <td><?php echo htmlspecialchars($article['author_id'] ?? ''); ?></td>
+                                        <td class="text-right">
+                                            <div class="btn-group" role="group">
+                                                <a class="btn btn-sm btn-outline-info" href="?action=edit&id=<?php echo $article['id_article']; ?>"><i class="fas fa-edit"></i></a>
+                                                <a class="btn btn-sm btn-outline-success" href="?action=approve&id=<?php echo $article['id_article']; ?>" title="Approuver"><i class="fas fa-check"></i></a>
+                                                <a class="btn btn-sm btn-outline-warning" href="?action=reject&id=<?php echo $article['id_article']; ?>" title="Rejeter"><i class="fas fa-times"></i></a>
+                                                <a class="btn btn-sm btn-outline-danger" href="?action=delete&id=<?php echo $article['id_article']; ?>" onclick="return confirm('Supprimer cet article ?');" title="Supprimer"><i class="fas fa-trash"></i></a>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
